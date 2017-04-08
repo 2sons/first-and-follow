@@ -1,11 +1,23 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
+typedef struct {
+	int number;
+	char * c;
+} Body;
+
+typedef struct {
+	int number;
+	Body * list;
+} Production;
 int main()
 {
 	int variables[256] = {0};
 	int terminals[256] = {0};
-	int * productions[256][2];
+	Production productions[256];
 	int i;
+	int j;
 	getInput(variables, terminals, productions);
 /*	for (i = 0; i < 256; i++) {
 		if (variables[i]) {
@@ -18,16 +30,29 @@ int main()
 			printf("%c ", i);
 		}
 	}
+	printf("\n");
+	for (i = 0; i < 256; i++) {
+		if (productions[i].number) {
+			for (j = 0; j < productions[i].number; j++) {
+				printf("%c -> %s\n", i, productions[i].list[j].c);
+			}
+
+		}
+	}
 */
 	return 0;
 }
 
-int getInput(int * variables, int * terminals, int * productions[256][2])
+int getInput(int * variables, int * terminals, Production productions[256])
 {
 	int i;
+	int j;
 	int c;
 	int numVariables;
 	int numTerminals;
+	int numProductions;
+	char head;
+	char body[50];//just an assumption for input length
 	printf("Variables: ");
 	scanf(" %d", &numVariables);
 	for (i = 0; i < numVariables; i++) {
@@ -39,6 +64,29 @@ int getInput(int * variables, int * terminals, int * productions[256][2])
 	for (i = 0; i < numTerminals; i++) {
 		scanf(" %c", &c);
 		terminals[c] = 1;
+	}
+	/*initialize production array*/
+	for (i = 0; i < 256; i++) {
+		productions[i].number = 0;
+		productions[i].list= NULL;
+	}
+	printf("Number of Productions: ");
+	scanf(" %d", &numProductions);
+	for (i = 0; i < numProductions; i++) {
+		scanf(" %c %s", &head, body);
+		if (variables[head]) {
+			productions[head].number++;
+			productions[head].list = (Body *) realloc(productions[head].list, productions[head].number * sizeof(Body));
+			productions[head].list[productions[head].number - 1].number = 0;
+			productions[head].list[productions[head].number - 1].c = NULL;
+			for (j = 0; j < strlen(body); j++) {
+				if (variables[body[j]] || terminals[body[j]]) {
+					productions[head].list[productions[head].number - 1].number++; 
+					productions[head].list[productions[head].number - 1].c = (char *) realloc(productions[head].list[productions[head].number - 1].c, productions[head].list[productions[head].number - 1].number * sizeof(char));
+					productions[head].list[productions[head].number - 1].c[productions[head].list[productions[head].number - 1].number - 1]  = body[j];
+				}
+			}
+		}
 	}
 	return 0;
 }
