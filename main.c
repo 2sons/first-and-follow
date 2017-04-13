@@ -129,7 +129,38 @@ int computeFollow(int * variables, int * terminals, Production * productions, ch
 			}
 		}
 	}
+	expandFollow(variables, follow);
 	displayFollow(follow);
+}
+
+int expandFollow(int * variables, char ** follow)
+{
+	int i;
+	int j;
+	int k;
+	for (i = 0; i < 256; i++) {
+		if (variables[i]) {
+			int boolean = 1;
+			int z = 3;
+			while (boolean) {
+				boolean = 0;
+				for (j = 0; j < 256; j++) {
+					if ((follow[i][j] == 1) && variables[j]) {
+						boolean = 1;
+						//copy follow of variable 'j' int o'i'
+						for (k = 0; k < 256; k++) {
+							if ((follow[j][k] == 1) && (follow[i][k] == 0)) {
+								//printf("Expanding: %c, Expanding with: %c, %c\n", i, j, k);
+								follow[i][k] = 1;
+							}
+						}
+						follow[i][j] = -1;
+
+					}
+				}
+			}
+		}
+	}
 }
 
 int displayFollow(char ** follow)
