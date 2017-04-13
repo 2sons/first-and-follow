@@ -129,6 +129,25 @@ int computeFollow(int * variables, int * terminals, Production * productions, ch
 			}
 		}
 	}
+	displayFollow(follow);
+}
+
+int displayFollow(char ** follow)
+{
+	int i;
+	int j;
+	printf("Follow\n");
+	for (i = 0; i < 256; i++) {
+		if (follow[i]) {
+			printf("follow( %c ) = { ", i);
+			for (j = 1; j < 256; j++) {
+				if (follow[i][j] == 1) {
+					printf("%c ", j);
+				}
+			}
+			printf("}\n");
+		}
+	}	
 }
 
 int computeFirst(int * variables, int * terminals, Production * productions, char ** first)
