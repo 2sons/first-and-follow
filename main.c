@@ -19,6 +19,10 @@ int main()
 	Production productions[256];
 	int i;
 	int j;
+	char ** first = (char **) malloc(256 * sizeof(char *));
+	for(i = 0; i < 256; i++) {
+		first[i] = NULL;
+	}
 	getInput(variables, terminals, productions);
 /*
 	for (i = 0; i < 256; i++) {
@@ -42,11 +46,92 @@ int main()
 		}
 	}
 */
-	computeFirst(variables, terminals, productions);
+	computeFirst(variables, terminals, productions, first);
+	computeFollow(variables, terminals, productions, first);
 	return 0;
 }
 
-int computeFirst(int * variables, int * terminals, Production * productions)
+int computeFollow(int * variables, int * terminals, Production * productions, char ** firstArray)
+{
+	int i;
+	int j;
+	int k;
+	int l;
+	int m;
+	char ** follow = (char **) malloc(256 * sizeof(char *));
+	for (i = 0; i < 256; i++) {
+		if (variables[i]) {
+			follow[i] = (char *) malloc(256 * sizeof(char));
+			for (j = 0; j < 256; j++) {
+				follow[i][j] = 0;
+			}
+			if (i == 'S') {
+				follow[i]['$'] = 1;
+			}
+		} else {
+			follow[i] = NULL;
+		}
+	}
+	for (i = 0; i < 256; i++) {
+		//i is the head of the production
+
+		//iterate over the number of productions for a given head
+		for (j = 0; j < productions[i].number; j++) {
+			char first = '\0';
+			char next = '\0';
+
+			//iterate over body of the production
+			for(k = 0; k < productions[i].list[j].number; k++) {
+				first = productions[i].list[j].c[k];
+				//first is the current symbol being processed
+
+				if (variables[first]) {
+					//if the current symbol is a variable then 
+
+					//if current symbols is a variable and it is the last in production body
+					// then add the head to the follow of symbol
+					if (k == productions[i].list[j].number - 1) {
+						follow[first][i] = 1;
+					}
+
+					for (l = k + 1; l < productions[i].list[j].number; l++) {
+						next = productions[i].list[j].c[l];
+						if (terminals[next]) {
+							if ((l == k + 1)) {
+								follow[first][next] = 1;
+							}
+							break;
+						} else if (variables[next]) {
+
+							//add the first of the variable
+							for (m = 0; m < 256; m++) {
+								if (firstArray[next][m]) {
+									follow[first][m] = 1;
+								}
+							}
+							if (isNullable(productions[next])) {
+								//printf("\nnullable\n");
+								//check if the variables in last in the list
+								if (l == productions[i].list[j].number - 1) {
+									//printf("something happened\n");
+									follow[first][i] = 1;
+								}
+								//continue the loop
+							} else {
+								break;
+							}
+						} else {
+							printf("Error: no clue\n");
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+int computeFirst(int * variables, int * terminals, Production * productions, char ** first)
 {
 	int i;
 	int j;
@@ -56,15 +141,15 @@ int computeFirst(int * variables, int * terminals, Production * productions)
 	for (i = 0; i < 256; i++) {
 		//if it is a terminal
 		if (variables[i]) {
-			char first[256] = {0};
-			firstOf(variables, terminals, productions, i, first);
+			first[i] = (char *) malloc(256 * sizeof(char));
+			firstOf(variables, terminals, productions, i, first[i]);
 			//display first of the terminal
 			printf("%c -> { ", i);
-			if (first[0]) {
+			if (first[i][0]) {
 				printf("epsilon ");
 			}
 			for (j = 1; j < 256; j++) {
-				if (first[j]) {
+				if (first[i][j]) {
 					printf("%c ", j);
 				}
 			}
