@@ -53,6 +53,7 @@ int main()
 
 int computeFollow(int * variables, int * terminals, Production * productions, char ** firstArray)
 {
+	int head;
 	int i;
 	int j;
 	int k;
@@ -72,49 +73,49 @@ int computeFollow(int * variables, int * terminals, Production * productions, ch
 			follow[i] = NULL;
 		}
 	}
-	for (i = 0; i < 256; i++) {
-		//i is the head of the production
+	for (head = 0; head < 256; head++) {
+		//head is the head of the production
 
 		//iterate over the number of productions for a given head
-		for (j = 0; j < productions[i].number; j++) {
-			char first = '\0';
-			char next = '\0';
+		for (j = 0; j < productions[head].number; j++) {
+			char symbol = '\0';
+			char lookahead = '\0';
 
 			//iterate over body of the production
-			for(k = 0; k < productions[i].list[j].number; k++) {
-				first = productions[i].list[j].c[k];
-				//first is the current symbol being processed
+			for(k = 0; k < productions[head].list[j].number; k++) {
+				symbol = productions[head].list[j].c[k];
+				//symbol is the current symbol being processed
 
-				if (variables[first]) {
+				if (variables[symbol]) {
 					//if the current symbol is a variable then 
 
 					//if current symbols is a variable and it is the last in production body
 					// then add the head to the follow of symbol
-					if (k == productions[i].list[j].number - 1) {
-						follow[first][i] = 1;
+					if (k == productions[head].list[j].number - 1) {
+						follow[symbol][head] = 1;
 					}
 
-					for (l = k + 1; l < productions[i].list[j].number; l++) {
-						next = productions[i].list[j].c[l];
-						if (terminals[next]) {
+					for (l = k + 1; l < productions[head].list[j].number; l++) {
+						lookahead = productions[head].list[j].c[l];
+						if (terminals[lookahead]) {
 							if ((l == k + 1)) {
-								follow[first][next] = 1;
+								follow[symbol][lookahead] = 1;
 							}
 							break;
-						} else if (variables[next]) {
+						} else if (variables[lookahead]) {
 
-							//add the first of the variable
+							//add the first of the variable to the symbol
 							for (m = 0; m < 256; m++) {
-								if (firstArray[next][m]) {
-									follow[first][m] = 1;
+								if (firstArray[lookahead][m]) {
+									follow[symbol][m] = 1;
 								}
 							}
-							if (isNullable(productions[next])) {
+							if (isNullable(productions[lookahead])) {
 								//printf("\nnullable\n");
 								//check if the variables in last in the list
-								if (l == productions[i].list[j].number - 1) {
+								if (l == productions[head].list[j].number - 1) {
 									//printf("something happened\n");
-									follow[first][i] = 1;
+									follow[symbol][head] = 1;
 								}
 								//continue the loop
 							} else {
