@@ -12,6 +12,14 @@ typedef struct {
 	Body * list;
 } Production;
 
+int getInput(int * variables, int * terminals, Production productions[256]);
+int computeFirst(int * variables, int * terminals, Production * productions, char ** first);
+int firstOf(int * variables, int * terminals, Production * productions, int symbol, char * first);
+int computeFollow(int * variables, int * terminals, Production * productions, char ** firstArray);
+int isNullable(Production production);
+int expandFollow(int * variables, char ** follow);
+int displayFollow(char ** follow);
+
 int main()
 {
 	int variables[256] = {0};
