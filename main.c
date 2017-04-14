@@ -24,28 +24,6 @@ int main()
 		first[i] = NULL;
 	}
 	getInput(variables, terminals, productions);
-/*
-	for (i = 0; i < 256; i++) {
-		if (variables[i]) {
-			printf("%c ", i);
-		}
-	}
-	printf("\n");
-	for (i = 0; i < 256; i++) {
-		if (terminals[i]) {
-			printf("%c ", i);
-		}
-	}
-	printf("\n");
-	for (i = 0; i < 256; i++) {
-		if (productions[i].number) {
-			for (j = 0; j < productions[i].number; j++) {
-				printf("%c -> %s\n", i, productions[i].list[j].c);
-			}
-
-		}
-	}
-*/
 	computeFirst(variables, terminals, productions, first);
 	computeFollow(variables, terminals, productions, first);
 	return 0;
@@ -148,7 +126,7 @@ int expandFollow(int * variables, char ** follow)
 				for (j = 0; j < 256; j++) {
 					if ((follow[i][j] == 1) && variables[j]) {
 						boolean = 1;
-						//copy follow of variable 'j' int o'i'
+						//copy follow of variable 'j' into 'i'
 						for (k = 0; k < 256; k++) {
 							if ((follow[j][k] == 1) && (follow[i][k] == 0)) {
 								//printf("Expanding: %c, Expanding with: %c, %c\n", i, j, k);
